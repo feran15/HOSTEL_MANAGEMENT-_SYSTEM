@@ -73,112 +73,112 @@ const  roomController = {
     }
   },
 
-  // Allocate room to student
-  allocateRoom: async (req, res) => {
-    try {
-      const { roomId, studentId } = req.body;
+//   // Allocate room to student
+//   allocateRoom: async (req, res) => {
+//     try {
+//       const { roomId, studentId } = req.body;
       
-      const room = await Room.findById(roomId);
-      if (!room) {
-        return res.status(404).json({ message: 'Room not found' });
-      }
+//       const room = await Room.findById(roomId);
+//       if (!room) {
+//         return res.status(404).json({ message: 'Room not found' });
+//       }
 
-      const student = await Student.findById(studentId);
-      if (!student) {
-        return res.status(404).json({ message: 'Student not found' });
-      }
+//       const student = await Student.findById(studentId);
+//       if (!student) {
+//         return res.status(404).json({ message: 'Student not found' });
+//       }
 
-      // Check if room is full
-      if (room.occupants.length >= room.capacity) {
-        return res.status(400).json({ message: 'Room is fully occupied' });
-      }
+//       // Check if room is full
+//       if (room.occupants.length >= room.capacity) {
+//         return res.status(400).json({ message: 'Room is fully occupied' });
+//       }
 
-      // Check if student is already allocated
-      if (student.room) {
-        return res.status(400).json({ message: 'Student already has a room allocated' });
-      }
+//       // Check if student is already allocated
+//       if (student.room) {
+//         return res.status(400).json({ message: 'Student already has a room allocated' });
+//       }
 
-      // Add student to room
-      room.occupants.push(studentId);
-      await room.save();
+//       // Add student to room
+//       room.occupants.push(studentId);
+//       await room.save();
 
-      // Update student's room
-      student.room = roomId;
-      await student.save();
+//       // Update student's room
+//       student.room = roomId;
+//       await student.save();
 
-      res.json({ message: 'Room allocated successfully', room });
-    } catch (error) {
-      res.status(500).json({ message: error.message });
-    }
-  },
+//       res.json({ message: 'Room allocated successfully', room });
+//     } catch (error) {
+//       res.status(500).json({ message: error.message });
+//     }
+//   },
 
-  // Deallocate room from student
-  deallocateRoom: async (req, res) => {
-    try {
-      const { roomId, studentId } = req.body;
+//   // Deallocate room from student
+//   deallocateRoom: async (req, res) => {
+//     try {
+//       const { roomId, studentId } = req.body;
       
-      const room = await Room.findById(roomId);
-      if (!room) {
-        return res.status(404).json({ message: 'Room not found' });
-      }
+//       const room = await Room.findById(roomId);
+//       if (!room) {
+//         return res.status(404).json({ message: 'Room not found' });
+//       }
 
-      const student = await Student.findById(studentId);
-      if (!student) {
-        return res.status(404).json({ message: 'Student not found' });
-      }
+//       const student = await Student.findById(studentId);
+//       if (!student) {
+//         return res.status(404).json({ message: 'Student not found' });
+//       }
 
-      // Remove student from room
-      room.occupants = room.occupants.filter(
-        occupant => occupant.toString() !== studentId
-      );
-      await room.save();
+//       // Remove student from room
+//       room.occupants = room.occupants.filter(
+//         occupant => occupant.toString() !== studentId
+//       );
+//       await room.save();
 
-      // Remove room from student
-      student.room = null;
-      await student.save();
+//       // Remove room from student
+//       student.room = null;
+//       await student.save();
 
-      res.json({ message: 'Room deallocated successfully', room });
-    } catch (error) {
-      res.status(500).json({ message: error.message });
-    }
-  },
+//       res.json({ message: 'Room deallocated successfully', room });
+//     } catch (error) {
+//       res.status(500).json({ message: error.message });
+//     }
+//   },
 
-  // Get available rooms
-  getAvailableRooms: async (req, res) => {
-    try {
-      const rooms = await Room.find({
-        $or: [
-          { status: 'Available' },
-          { status: 'Partially Filled' }
-        ]
-      }).populate('occupants', 'name');
-      res.json(rooms);
-    } catch (error) {
-      res.status(500).json({ message: error.message });
-    }
-  },
+//   // Get available rooms
+//   getAvailableRooms: async (req, res) => {
+//     try {
+//       const rooms = await Room.find({
+//         $or: [
+//           { status: 'Available' },
+//           { status: 'Partially Filled' }
+//         ]
+//       }).populate('occupants', 'name');
+//       res.json(rooms);
+//     } catch (error) {
+//       res.status(500).json({ message: error.message });
+//     }
+//   },
 
-  // Search rooms
-  searchRooms: async (req, res) => {
-    try {
-      const { block, roomType, status, minRent, maxRent } = req.query;
+//   // Search rooms
+//   searchRooms: async (req, res) => {
+//     try {
+//       const { block, roomType, status, minRent, maxRent } = req.query;
       
-      const query = {};
-      if (block) query.block = block;
-      if (roomType) query.roomType = roomType;
-      if (status) query.status = status;
-      if (minRent || maxRent) {
-        query.monthlyRent = {};
-        if (minRent) query.monthlyRent.$gte = minRent;
-        if (maxRent) query.monthlyRent.$lte = maxRent;
-      }
+//       const query = {};
+//       if (block) query.block = block;
+//       if (roomType) query.roomType = roomType;
+//       if (status) query.status = status;
+//       if (minRent || maxRent) {
+//         query.monthlyRent = {};
+//         if (minRent) query.monthlyRent.$gte = minRent;
+//         if (maxRent) query.monthlyRent.$lte = maxRent;
+//       }
 
-      const rooms = await Room.find(query).populate('occupants', 'name');
-      res.json(rooms);
-    } catch (error) {
-      res.status(500).json({ message: error.message });
-    }
-  }
-};
+//       const rooms = await Room.find(query).populate('occupants', 'name');
+//       res.json(rooms);
+//     } catch (error) {
+//       res.status(500).json({ message: error.message });
+//     }
+//   }
+ };
 
 module.exports = roomController; 

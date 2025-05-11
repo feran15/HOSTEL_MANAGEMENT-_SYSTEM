@@ -24,18 +24,19 @@ router.post('/register', async (req, res) => {
       email: req.body.email,
       password: hashedPassword
     });
+    
     // Allocate Room
-    const room = await allocateRoom(newUser._id);
-    try{
-      res.status(201).json({
-        message: 'Signup successful',
-        user: newUser,
-        allocatedRoom: room,
-      });
-      await room.save()
-    } catch (error) {
-      res.status(500).json({ message: error.message });
-    }
+    // const room = await allocateRoom(newUser._id);
+    // try{
+    //   res.status(201).json({
+    //      message: 'Signup successful',
+    //      user: newUser,
+    //      allocatedRoom: room,
+    //   });
+    //   await room.save()
+    // } catch (error) {
+    //   res.status(500).json({ message: error.message });
+    // }
     // Save user
     const savedUser = await newUser.save();
     const { password, ...userWithoutPassword } = savedUser._doc;
@@ -55,7 +56,7 @@ router.post('/login', async (req, res) => {
       return res.status(404).json({ message: 'User not found' });
     }
 
-    // Validate password
+    //  Validate password
     const validPassword = await bcrypt.compare(req.body.password, user.password);
     if (!validPassword) {
       return res.status(400).json({ message: 'Invalid password' });
@@ -65,7 +66,7 @@ router.post('/login', async (req, res) => {
     const token = jwt.sign(
       { id: user._id },
       process.env.JWT_SECRET,
-      { expiresIn: '30d' }
+      { expiresIn: '60d' }
     );
 
     const { password, ...userWithoutPassword } = user._doc;
