@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const Room = require("../model/room");
-const AppError = require("../utils/AppError");
+ 
 
 // Create Room
 router.post('/create', async (req, res, next) => {

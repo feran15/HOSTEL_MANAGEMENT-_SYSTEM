@@ -2,6 +2,7 @@ const express = require('express')
 const router = express.Router()
 const Payment = require ('../model/Payment')
 const AppError = require("../utils/AppError");
+// const { name } = require('../server');
 // Make a new payment
 router.post('/Pay', async (req, res, next) => {
     try{
@@ -33,7 +34,11 @@ router.get ('/id', async (req, res, next) => {
     try {
         const room = await Payment.findById(req.params.id);
         if(!Payment) {
-            return next ()
+            return next (new AppError ("Payment not made", 404)
+            )
         }
+        res.json(room)
+    } catch(err) {
+        next(err)
     }
 })
